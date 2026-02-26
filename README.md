@@ -1,5 +1,7 @@
 # Hetzner DDNS Updater
 
+[![Publish Docker image](https://github.com/vdw/hetzner_ddns/actions/workflows/docker-publish.yml/badge.svg?branch=main)](https://github.com/vdw/hetzner_ddns/actions/workflows/docker-publish.yml)
+
 Small Python script that updates one or more Hetzner DNS `A` records with your current public IP.
 
 ## Features
