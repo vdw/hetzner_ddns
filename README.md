@@ -122,3 +122,24 @@ The compose service includes Docker log rotation using:
 
 - `max-size: 10m`
 - `max-file: 3`
+
+## Prebuilt Image (GHCR)
+
+This repository includes a GitHub Actions workflow at `.github/workflows/docker-publish.yml`.
+
+- On each push to `main`, it builds and publishes a multi-arch image to GHCR.
+- On tags like `v1.0.0`, it also publishes tag-based versions.
+- You can also run it manually from the Actions tab (`workflow_dispatch`).
+
+Published image name:
+
+```text
+ghcr.io/vdw/hetzner_ddns
+```
+
+Run prebuilt image on a server:
+
+```bash
+docker pull ghcr.io/vdw/hetzner_ddns:latest
+docker run -d --name hetzner-ddns --restart unless-stopped --env-file .env ghcr.io/vdw/hetzner_ddns:latest
+```
