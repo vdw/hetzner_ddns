@@ -7,6 +7,7 @@ Small Python script that updates one or more Hetzner DNS `A` records with your c
 ## Features
 
 - Updates multiple subdomains in one run
+- Updates multiple DNS zones in one run (single container)
 - Supports one-shot mode (`--once`) for Linux cron
 - Supports continuous mode (internal sleep loop) for long-running Docker/container use
 - Configuration via environment variables (no token in source code)
@@ -16,6 +17,10 @@ Small Python script that updates one or more Hetzner DNS `A` records with your c
 Required:
 
 - `HETZNER_API_TOKEN`: Hetzner API token
+- `HETZNER_ZONE_RECORDS`: zone-to-record mapping (example: `example.com:www,api;example.net:home;example.org:cloud`)
+
+Legacy fallback (single-zone):
+
 - `HETZNER_ZONE_NAME`: DNS zone name (example: `example.com`)
 - `HETZNER_RECORD_NAMES`: comma-separated subdomain labels (example: `www,nextcloud`)
 
@@ -36,8 +41,7 @@ Run once (good for cron):
 
 ```bash
 HETZNER_API_TOKEN="..." \
-HETZNER_ZONE_NAME="example.com" \
-HETZNER_RECORD_NAMES="www" \
+HETZNER_ZONE_RECORDS="example.com:www,api;example.net:home;example.org:cloud" \
 python3 hetzner_ddns.py --once
 ```
 
@@ -45,8 +49,7 @@ Run continuously (every 60 seconds by default):
 
 ```bash
 HETZNER_API_TOKEN="..." \
-HETZNER_ZONE_NAME="example.com" \
-HETZNER_RECORD_NAMES="www" \
+HETZNER_ZONE_RECORDS="example.com:www,api;example.net:home;example.org:cloud" \
 HETZNER_INTERVAL="60" \
 python3 hetzner_ddns.py
 ```
@@ -62,7 +65,7 @@ crontab -e
 Add:
 
 ```cron
-* * * * * cd /home/dkrestos/Projects/hetzner_ddns && HETZNER_API_TOKEN="..." HETZNER_ZONE_NAME="example.com" HETZNER_RECORD_NAMES="www" /usr/bin/python3 /home/dkrestos/Projects/hetzner_ddns/hetzner_ddns.py --once >> /tmp/hetzner_ddns.log 2>&1
+* * * * * cd /home/dkrestos/Projects/hetzner_ddns && HETZNER_API_TOKEN="..." HETZNER_ZONE_RECORDS="example.com:www,api;example.net:home;example.org:cloud" /usr/bin/python3 /home/dkrestos/Projects/hetzner_ddns/hetzner_ddns.py --once >> /tmp/hetzner_ddns.log 2>&1
 ```
 
 ## Docker
@@ -78,8 +81,7 @@ One-shot container run:
 ```bash
 docker run --rm \
   -e HETZNER_API_TOKEN="..." \
-  -e HETZNER_ZONE_NAME="example.com" \
-  -e HETZNER_RECORD_NAMES="www" \
+  -e HETZNER_ZONE_RECORDS="example.com:www,api;example.net:home;example.org:cloud" \
   hetzner-ddns --once
 ```
 
@@ -88,8 +90,7 @@ Long-running container:
 ```bash
 docker run --name hetzner-ddns --restart unless-stopped -d \
   -e HETZNER_API_TOKEN="..." \
-  -e HETZNER_ZONE_NAME="example.com" \
-  -e HETZNER_RECORD_NAMES="www" \
+  -e HETZNER_ZONE_RECORDS="example.com:www,api;example.net:home;example.org:cloud" \
   -e HETZNER_INTERVAL="60" \
   hetzner-ddns
 ```
@@ -97,7 +98,7 @@ docker run --name hetzner-ddns --restart unless-stopped -d \
 Host cron calling one-shot container every minute:
 
 ```cron
-* * * * * docker run --rm -e HETZNER_API_TOKEN="..." -e HETZNER_ZONE_NAME="example.com" -e HETZNER_RECORD_NAMES="www" hetzner-ddns --once >> /tmp/hetzner_ddns_docker.log 2>&1
+* * * * * docker run --rm -e HETZNER_API_TOKEN="..." -e HETZNER_ZONE_RECORDS="example.com:www,api;example.net:home;example.org:cloud" hetzner-ddns --once >> /tmp/hetzner_ddns_docker.log 2>&1
 ```
 
 ## Docker Compose
